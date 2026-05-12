@@ -116,3 +116,172 @@ Output: chunk_augmented_<test_id>/*.parquet
 Each chunk becomes: \[metadata prefix\] + original text
 
 
+---
+
+## 5. Embedding Generation
+
+### Standard (`5_embeddings.py`)
+
+- Uses `SentenceTransformer`
+- Model: `BAAI/bge-small-en-v1.5`
+- Single GPU per process
+- Normalized embeddings
+
+---
+
+### vLLM Multi-GPU (`5_embeddings_vllm.py`)
+
+- Distributed embedding generation
+- One process per GPU
+- Higher throughput via VLLM backend
+- Token truncation: 512 tokens
+
+Output: embeddings_<test_id>/*.parquet
+
+
+Each row:
+- `id`
+- embedding vector
+
+---
+
+## 6. Vector Indexing (`6_faiss.py`)
+
+Builds a FAISS Approximate Nearest Neighbor index.
+
+**Key features:**
+- IVF-PQ index
+- Cosine similarity (inner product + normalization)
+- Training sample: 1.5M vectors
+- Batch insertion at scale
+
+Output: "faiss_indexes"/ivfpq_index_<test_id>.faiss
+
+
+---
+
+## 7. Sampling (`7_samples.py`)
+
+Creates a fixed evaluation subset of Wikipedia chunks.
+
+- Random sample: 1,000,000 chunks
+- Preserves global IDs
+- Efficient file-level selection
+
+Output: samples.parquet
+
+
+---
+
+## 8. Synthetic Question Generation
+
+### Standard (`8_questions.py`)
+Uses:
+- `mistralai/Mistral-7B-v0.1`
+
+Generates search-style questions from passages.
+
+---
+
+### vLLM (`8_questions_vllm.py`)
+
+- Batch inference
+- Higher throughput
+- Includes validation:
+  - single sentence constraint
+  - question formatting checks
+
+Output: question_parquets/*.parquet
+
+
+---
+
+## 9. Question Refinement (`9_refine_vllm.py`)
+
+- Detects invalid questions
+- Regenerates only bad samples
+- Iterates until convergence
+
+---
+
+## 10. Question Rewording (`10_reword_vllm.py`)
+
+Rewrites questions while preserving meaning.
+
+Checks:
+- single sentence
+- valid question format
+- no metadata leakage
+
+---
+
+## 11. Question Embeddings (`11_embed_questions.py`)
+
+Encodes questions into vector space.
+
+- Optional reworded embeddings
+- GPU-specific execution
+- Model: `BAAI/bge-small-en-v1.5`
+
+Output: question_embeddings/ or reworded_embeddings/
+
+
+---
+
+## 12. Retrieval Evaluation (`12_test.py`)
+
+Evaluates FAISS retrieval performance.
+
+**Metrics:**
+- Recall@10
+- Recall@100
+- Recall@1000
+- MRR (Mean Reciprocal Rank)
+
+Process:
+1. Embed question
+2. Query FAISS index
+3. Check if correct chunk ID is retrieved
+
+---
+
+# Key Research Focus
+
+- Chunking strategy impact on retrieval
+- Effect of metadata injection into embeddings
+- Synthetic query quality and diversity
+- Embedding robustness under structured vs raw text
+- Large-scale FAISS retrieval performance
+
+---
+
+# Tech Stack
+
+- Python
+- Wikipedia XML dumps
+- lxml, mwparserfromhell
+- PyArrow / Parquet
+- SentenceTransformers
+- VLLM (Mistral-7B)
+- FAISS (IVF-PQ)
+- NLTK
+
+---
+
+# Output Artifacts
+
+- Raw Wikipedia batches (JSONL)
+- Sectioned data (JSONL)
+- Chunked datasets (Parquet)
+- Metadata-augmented chunks
+- Embeddings (chunk + question)
+- FAISS index
+- Synthetic question datasets
+- Retrieval evaluation metrics
+
+---
+
+# Summary
+
+This project implements a full pipeline for evaluating how chunking strategy, metadata augmentation, and synthetic query generation affect embedding-based retrieval systems at Wikipedia scale.
+
