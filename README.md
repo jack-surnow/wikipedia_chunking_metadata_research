@@ -54,13 +54,13 @@ Converts raw article text into structured sections using wiki markup parsing.
 **Key features:**
 - Uses `mwparserfromhell`
 - Removes:
-- References
-- External links
-- boilerplate sections
-- Preserves:
-- section hierarchy
-- section paths
-- section depth
+  - References
+  - External links
+  - boilerplate sections
+  - Preserves:
+  - section hierarchy
+  - section paths
+  - section depth
 
 Output: section_batches/*.jsonl
 
