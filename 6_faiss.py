@@ -3,12 +3,16 @@
 
 import os
 import glob
+from pathlib import Path
+
 import numpy as np
 import pyarrow.dataset as ds
 import faiss
 import random
 import time
 
+BASE_DIR = Path(__file__).resolve().parent
+OUTPUT_DIR = BASE_DIR / "faiss_indexes"
 
 TESTS = [15]
 
@@ -56,7 +60,7 @@ def create_index(test_num):
     t1 = time.perf_counter()
 
     input_dir = f"embeddings_{test_num}"
-    index_path = f"ivfpq_index_{test_num}.faiss"
+    index_path = OUTPUT_DIR / f"ivfpq_index_{test_num}.faiss"
 
     # Create IVF-PQ index with flat inner product quantizer
     quantizer = faiss.IndexFlatIP(DIM)
