@@ -9,6 +9,7 @@ import re
 
 
 # Configuration for Wikipedia data extraction
+INPUT_PATH = "C:/Wikipedia Datasets/enwiki-20260301-pages-articles-multistream.xml.bz2"
 OUTPUT_DIR = "raw_batches"
 
 # Starting batch number for processing (allows resuming from checkpoints)
@@ -45,7 +46,7 @@ def main():
 
     unknown_count = 0
     # Stream parse Wikipedia XML to avoid loading entire dump in memory
-    with bz2.open("C:/Wikipedia Datasets/enwiki-20260301-pages-articles-multistream.xml.bz2", "rb") as f:
+    with bz2.open(INPUT_PATH, "rb") as f:
         context = etree.iterparse(f, events=("end",), tag="{*}page")
 
         batch_number = 0
