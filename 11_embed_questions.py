@@ -1,0 +1,130 @@
+import os
+import glob
+from pathlib import Path
+import sys
+
+import numpy as np
+import pyarrow as pa
+import pyarrow.parquet as pq
+import pyarrow.dataset as ds
+
+import torch
+from sentence_transformers import SentenceTransformer
+
+
+# Require a GPU id argument for this script
+if len(sys.argv) < 2:
+    raise Exception("must provide GPU id")
+
+
+REWORDED_QUESTIONS = True
+
+GPU_ID = int(sys.argv[1])
+GPU_COUNT = 2
+
+BASE_DIR = Path(__file__).resolve().parent
+INPUT_DIR = BASE_DIR / "question_parquets"
+
+# Output directory depends on whether questions were reworded
+if REWORDED_QUESTIONS:
+    OUTPUT_DIR = BASE_DIR / "reworded_embeddings"
+else:
+    OUTPUT_DIR = BASE_DIR / "question_embeddings"
+
+# Embedding settings
+BATCH_SIZE = 32
+MAX_LENGTH = 512
+
+
+def generate(gpu_id, model, output_dir, file_list):
+    # Generate embeddings for each assigned parquet file
+    with torch.inference_mode():
+        for file in file_list:
+            filename = os.path.basename(file)
+            out_path = os.path.join(output_dir, filename)
+
+            print(f"[GPU {gpu_id}] {filename}", flush=True)
+
+            dataset = ds.dataset(file, format="parquet")
+
+            # Select the appropriate text field based on question type
+            if REWORDED_QUESTIONS:
+                table = dataset.to_table(columns=["id", "reworded"])
+            else:
+                table = dataset.to_table(columns=["id", "question"])
+            
+            ids = table.column("id").to_numpy()
+            if REWORDED_QUESTIONS:
+                questions = table.column("reworded").to_pylist()
+            else:
+                questions = table.column("question").to_pylist()
+            
+            # Encode text to fixed-size normalized embeddings
+            embeddings = model.encode(
+                questions,
+                batch_size=BATCH_SIZE,
+                normalize_embeddings=True,
+                show_progress_bar=False,
+                convert_to_numpy=True,
+            ).astype(np.float32)
+
+            id_array = pa.array(ids, type=pa.int64())
+
+            # Store embeddings as a fixed-size list array in parquet
+            emb_array = pa.FixedSizeListArray.from_arrays(
+                pa.array(embeddings.ravel(), type=pa.float32()),
+                embeddings.shape[1]
+            )
+
+            table_out = pa.Table.from_arrays(
+                [id_array, emb_array],
+                names=["id", "embedding"]
+            )
+
+            writer = pq.ParquetWriter(
+                out_path,
+                table_out.schema,
+                compression="snappy"
+            )
+
+            writer.write_table(table_out)
+            writer.close()
+
+
+def main():
+    gpu_id = GPU_ID
+
+    # Enable TF32 support for faster matrix math on supported hardware
+    torch.backends.cuda.matmul.allow_tf32 = True
+    torch.backends.cudnn.allow_tf32 = True
+
+    # Load the SentenceTransformer model onto the configured GPU
+    model = SentenceTransformer(
+        "BAAI/bge-small-en-v1.5",
+        device=f"cuda:{gpu_id}",
+        model_kwargs={"dtype": torch.float16}
+    )
+    model.max_seq_length = MAX_LENGTH
+
+    input_dir = INPUT_DIR
+    output_dir = OUTPUT_DIR
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    files = sorted(glob.glob(os.path.join(input_dir, "*.parquet")))
+    num_files = len(files)
+
+    # Divide the input files across available GPUs
+    files_per_gpu = num_files // GPU_COUNT
+    remainder = num_files % GPU_COUNT
+
+    start = gpu_id * files_per_gpu + min(gpu_id, remainder)
+    end = start + files_per_gpu + (1 if gpu_id < remainder else 0)
+
+    generate(gpu_id, model, output_dir, files[start:end])
+
+    print("\n\n\n", flush=True)
+
+
+if __name__ == "__main__":
+    main()
