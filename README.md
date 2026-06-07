@@ -58,7 +58,7 @@ Recall@K measures whether the correct chunk appears within the top-K retrieved r
 
 ---
 
-## 2. Experiment Ran over queries using different wording from target chunks
+## 2. Reworded Synthetic Queries (LLM-Paraphrased)
 
 The same evaluation pipeline was used as in the direct synthetic query experiment. The only difference is that each synthetic query was additionally rephrased using an LLM to introduce lexical and syntactic variation.
 
