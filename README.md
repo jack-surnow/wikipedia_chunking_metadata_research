@@ -26,25 +26,54 @@ The project builds a full pipeline from raw Wikipedia XML → structured chunks 
 | 14 | Page title + section title + depth level + position |
 | 15 | Page title + parent title + section title + depth level + position |
 
+Metadata fields were prepended to the beginning of each chunk prior to embedding. Each metadata field was placed on its own line, and the metadata block was separated from the chunk text by a blank line.
+
+
 # Key Results
+
+##1. Experiment Ran over queries dirrectly generated from target chunks
 
 |   Test |   Recall@10 |   Recall@100 |   Recall@1000 |     MRR |
 |-------:|------------:|-------------:|--------------:|--------:|
 |      1 |     0.28823 |      0.37744 |       0.44729 | 0.20552 |
 |      2 |     0.28636 |      0.37464 |       0.44256 | 0.20434 |
 |      3 |     0.30752 |      0.3999  |       0.46907 | 0.21467 |
-|      4 |     0.30134 |      0.39051 |       0.45849 | 0.21719 |
+|      4 |     0.30134 |      0.39051 |       0.45849 | **0.21719** |
 |      5 |     0.28911 |      0.37783 |       0.44644 | 0.20539 |
 |      6 |     0.29903 |      0.38271 |       0.44744 | 0.21494 |
 |      7 |     0.29866 |      0.38677 |       0.45282 | 0.21196 |
 |      8 |     0.30423 |      0.39518 |       0.46464 | 0.21355 |
 |      9 |     0.29653 |      0.386   |       0.45428 | 0.2125  |
-|     10 |     0.30815 |      0.40006 |       0.4692  | 0.21582 |
+|     10 |     **0.30815** |      **0.40006** |       **0.4692**  | **0.21582** |
 |     11 |     0.29164 |      0.37642 |       0.44017 | 0.20812 |
 |     12 |     0.30531 |      0.39581 |       0.46299 | 0.21504 |
 |     13 |     0.30223 |      0.39513 |       0.46393 | 0.21077 |
 |     14 |     0.30112 |      0.39273 |       0.4612  | 0.21243 |
 |     15 |     0.3028  |      0.39383 |       0.46259 | 0.21092 |
+
+All metadata configurations were evaluated on an identical test set of 1 million synthetic questions. Each question was generated from a specific target chunk, allowing retrieval performance to be measured against a known ground-truth document. Recall@K reports whether the target chunk appears within the top-K retrieved results, while MRR measures the rank position of the first correct retrieval.
+
+##2. Experiment Ran over queries using different wording from target chunks
+
+|   Test |   Recall@10 |   Recall@100 |   Recall@1000 |     MRR |
+|-------:|------------:|-------------:|--------------:|--------:|
+|      1 |     0.26715 |      0.35626 |       0.42712 | 0.18797 |
+|      2 |     0.26675 |      0.35452 |       0.42389 | 0.18798 |
+|      3 |     0.28841 |      0.37993 |       0.44994 | 0.19865 |
+|      4 |     0.28069 |      0.37045 |       0.43982 | 0.19917 |
+|      5 |     0.26949 |      0.35762 |       0.42736 | 0.18845 |
+|      6 |     0.2785  |      0.36251 |       0.42875 | 0.1975  |
+|      7 |     0.27807 |      0.36619 |       0.4335  | 0.19432 |
+|      8 |     0.28324 |      0.37476 |       0.44568 | 0.19653 |
+|      9 |     0.27609 |      0.36467 |       0.43452 | 0.19524 |
+|     10 |     0.28749 |      0.37901 |       0.44999 | 0.19873 |
+|     11 |     0.27174 |      0.35782 |       0.42292 | 0.19181 |
+|     12 |     0.28514 |      0.37486 |       0.4437  | 0.19828 |
+|     13 |     0.28206 |      0.3748  |       0.44572 | 0.19438 |
+|     14 |     0.28135 |      0.37134 |       0.44145 | 0.19582 |
+|     15 |     0.28267 |      0.37427 |       0.4438  | 0.19475 |
+
+In addition to the above query evaluation, I conducted this evaluation setup is identical to the baseline experiment, except that all synthetic queries were additionally reworded using an LLM. This rephrasing step introduces lexical diversity and reduces direct wording overlap between queries and their corresponding target chunks, providing a more realistic approximation of natural language retrieval conditions.
 
 ---
 
