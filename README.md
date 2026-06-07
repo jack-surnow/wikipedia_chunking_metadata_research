@@ -6,9 +6,7 @@ The project builds a full pipeline from raw Wikipedia XML → structured chunks 
 
 ---
 
-# Key Results
-
-# Metadata Configurations
+# Tested Metadata Configurations
 
 | Test | Description |
 |------|-------------|
@@ -27,6 +25,8 @@ The project builds a full pipeline from raw Wikipedia XML → structured chunks 
 | 13 | Page title + section title + position |
 | 14 | Page title + section title + depth level + position |
 | 15 | Page title + parent section + section title + depth level + position |
+
+# Key Results
 
 |   Test |   Recall@10 |   Recall@100 |   Recall@1000 |     MRR |
 |-------:|------------:|-------------:|--------------:|--------:|
