@@ -10,21 +10,21 @@ The project builds a full pipeline from raw Wikipedia XML → structured chunks 
 
 | Test | Description |
 |------|-------------|
-| 1 | No metadata (baseline) |
-| 2 | Full hierarchical path |
+| 1 | No metadata (baseline 1) |
+| 2 | Full hierarchical path (baseline 2) |
 | 3 | Page title |
 | 4 | Section title |
-| 5 | Parent section |
+| 5 | Parent section title |
 | 6 | Section depth level |
 | 7 | Section position within page |
 | 8 | Page title + section title |
-| 9 | Parent section + section title |
-| 10 | Page title + parent section + section title |
+| 9 | Parent title + section title |
+| 10 | Page title + parent title + section title |
 | 11 | Section depth level + position |
 | 12 | Page title + section title + depth level |
 | 13 | Page title + section title + position |
 | 14 | Page title + section title + depth level + position |
-| 15 | Page title + parent section + section title + depth level + position |
+| 15 | Page title + parent title + section title + depth level + position |
 
 # Key Results
 
