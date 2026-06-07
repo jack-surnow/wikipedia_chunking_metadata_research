@@ -28,10 +28,15 @@ The project builds a full pipeline from raw Wikipedia XML → structured chunks 
 
 Metadata fields were prepended to the beginning of each chunk prior to embedding. Each metadata field was placed on its own line, and the metadata block was separated from the chunk text by a blank line.
 
+---
 
 # Key Results
 
-##1. Experiment Ran over queries dirrectly generated from target chunks
+## 1. Direct Synthetic Queries (Ground-Truth Aligned)
+
+All metadata configurations were evaluated on an identical test set of 1 million synthetic questions. Each question was generated directly from a target chunk, enabling exact ground-truth evaluation.
+
+Recall@K measures whether the correct chunk appears within the top-K retrieved results. MRR measures the rank position of the first correct retrieval.
 
 |   Test |   Recall@10 |   Recall@100 |   Recall@1000 |     MRR |
 |-------:|------------:|-------------:|--------------:|--------:|
@@ -51,9 +56,13 @@ Metadata fields were prepended to the beginning of each chunk prior to embedding
 |     14 |     0.30112 |      0.39273 |       0.4612  | 0.21243 |
 |     15 |     0.3028  |      0.39383 |       0.46259 | 0.21092 |
 
-All metadata configurations were evaluated on an identical test set of 1 million synthetic questions. Each question was generated from a specific target chunk, allowing retrieval performance to be measured against a known ground-truth document. Recall@K reports whether the target chunk appears within the top-K retrieved results, while MRR measures the rank position of the first correct retrieval.
+---
 
-##2. Experiment Ran over queries using different wording from target chunks
+## 2. Experiment Ran over queries using different wording from target chunks
+
+The same evaluation pipeline was used as in the direct synthetic query experiment. The only difference is that each synthetic query was additionally rephrased using an LLM to introduce lexical and syntactic variation.
+
+This reduces direct wording overlap between queries and target chunks, producing a more realistic approximation of natural user queries.
 
 |   Test |   Recall@10 |   Recall@100 |   Recall@1000 |     MRR |
 |-------:|------------:|-------------:|--------------:|--------:|
@@ -72,8 +81,6 @@ All metadata configurations were evaluated on an identical test set of 1 million
 |     13 |     0.28206 |      0.3748  |       0.44572 | 0.19438 |
 |     14 |     0.28135 |      0.37134 |       0.44145 | 0.19582 |
 |     15 |     0.28267 |      0.37427 |       0.4438  | 0.19475 |
-
-In addition to the above query evaluation, I conducted this evaluation setup is identical to the baseline experiment, except that all synthetic queries were additionally reworded using an LLM. This rephrasing step introduces lexical diversity and reduces direct wording overlap between queries and their corresponding target chunks, providing a more realistic approximation of natural language retrieval conditions.
 
 ---
 
