@@ -6,6 +6,48 @@ The project builds a full pipeline from raw Wikipedia XML → structured chunks 
 
 ---
 
+# Key Results
+
+# Metadata Configurations
+
+| Test | Description |
+|------|-------------|
+| 1 | No metadata (baseline) |
+| 2 | Full hierarchical path |
+| 3 | Page title |
+| 4 | Section title |
+| 5 | Parent section |
+| 6 | Section depth level |
+| 7 | Section position within page |
+| 8 | Page title + section title |
+| 9 | Parent section + section title |
+| 10 | Page title + parent section + section title |
+| 11 | Section depth level + position |
+| 12 | Page title + section title + depth level |
+| 13 | Page title + section title + position |
+| 14 | Page title + section title + depth level + position |
+| 15 | Page title + parent section + section title + depth level + position |
+
+|   Test |   Recall@10 |   Recall@100 |   Recall@1000 |     MRR |
+|-------:|------------:|-------------:|--------------:|--------:|
+|      1 |     0.28823 |      0.37744 |       0.44729 | 0.20552 |
+|      2 |     0.28636 |      0.37464 |       0.44256 | 0.20434 |
+|      3 |     0.30752 |      0.3999  |       0.46907 | 0.21467 |
+|      4 |     0.30134 |      0.39051 |       0.45849 | 0.21719 |
+|      5 |     0.28911 |      0.37783 |       0.44644 | 0.20539 |
+|      6 |     0.29903 |      0.38271 |       0.44744 | 0.21494 |
+|      7 |     0.29866 |      0.38677 |       0.45282 | 0.21196 |
+|      8 |     0.30423 |      0.39518 |       0.46464 | 0.21355 |
+|      9 |     0.29653 |      0.386   |       0.45428 | 0.2125  |
+|     10 |     0.30815 |      0.40006 |       0.4692  | 0.21582 |
+|     11 |     0.29164 |      0.37642 |       0.44017 | 0.20812 |
+|     12 |     0.30531 |      0.39581 |       0.46299 | 0.21504 |
+|     13 |     0.30223 |      0.39513 |       0.46393 | 0.21077 |
+|     14 |     0.30112 |      0.39273 |       0.4612  | 0.21243 |
+|     15 |     0.3028  |      0.39383 |       0.46259 | 0.21092 |
+
+---
+
 # Pipeline Overview
 
 1_raw.py
