@@ -92,26 +92,18 @@ def build_input(record, fields):
     meta = "\n".join(meta_lines)
 
     if "path" in fields and record["path"]:
-            # Append truncated path metadata without exceeding budget
-            if meta:
-                meta += "\npath: "
-            else:
-                meta += "path: "
+        # Preserve the deepest complete path components within the metadata budget.
+        meta += "\npath: " if meta else "path: "
+        remaining_len = MAX_META_LEN - len(meta)
+        path = ""
 
-            remaining_len = MAX_META_LEN - len(meta)
+        for part in reversed(record["path"].split("\\/")):
+            candidate = part + (">" + path if path else "")
+            if len(candidate) > remaining_len:
+                break
+            path = candidate
 
-            parts = record["path"].split("\\/")
-            path = ""
-
-            for part in reversed(parts):
-                if len(path) + len(part) + 1 > remaining_len:
-                    break
-                path = part + ">" + path
-
-            if path and path.endswith(">"):
-                path = path[:-1]
-            else:
-                meta += path
+        meta += path
 
     # Enforce maximum metadata length before appending text
     if len(meta) > MAX_META_LEN:
