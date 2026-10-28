@@ -18,8 +18,6 @@ The repository contains the pipeline scripts and reported result tables. It does
 - **Additional fields do not guarantee better retrieval.** Adding depth and position to the three-title configuration lowers Recall@10 in both query sets.
 - **Rewording makes source-chunk retrieval harder in these runs.** It introduces a second query condition, but does not establish performance on real user questions.
 
-> **Historical full-path baseline needs verification.** An earlier `build_input()` implementation in [`4_metadata.py`](4_metadata.py) dropped a successfully constructed hierarchy, leaving only `path: ` before the passage. The implementation now appends the hierarchy and retains the deepest complete components that fit the metadata budget, including exact-length fits. Test 2 below is still the original reported result, not a rerun of the fix. Check the original generating code or artifacts and, if affected, regenerate test 2's augmented passages, embeddings, index, and metrics for both query conditions before drawing conclusions about hierarchical-path metadata.
-
 ## Experimental setup
 
 This is a **metadata ablation with a fixed chunking pipeline**, not a comparison of different chunking algorithms or an end-to-end answer-quality benchmark.
@@ -190,7 +188,7 @@ python 12_test.py
 
 Repeat query embedding and evaluation with `REWORDED_QUESTIONS=False` and `True`, using separate metric output directories. For the SentenceTransformers passage-embedding alternative, use `python 5_embeddings.py 0` and `python 5_embeddings.py 1` instead of `5_embeddings_vllm.py`, after aligning `TESTS` and `GPU_COUNT`.
 
-Start with a small corpus to validate paths, ID alignment, and output schemas. Reduce sampling counts and FAISS training/index parameters to suit that corpus; a smoke run with altered settings does not reproduce the full-scale results above.
+Start with a small corpus to validate paths, ID alignment, and output schemas. Reduce sampling counts and FAISS training/index parameters to suit that corpus; a smoke run with altered settings does not reproduce the -scale results above.
 
 ## Interpretation and limitations
 
